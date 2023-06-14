@@ -1,0 +1,38 @@
+# Check if Flutter version is provided as an argument
+if [ $# -eq 0 ]; then
+  usage
+  exit 1
+fi
+
+# Extract Flutter version from the argument
+flutter_version="$1"
+flutter_version_underscored=$(echo "$flutter_version" | tr '.' '_')
+version_folder="$HOME/.fluttervm/versions/$flutter_version_underscored"
+
+# Function to remove existing links
+remove_existing_links() {
+  if [ -L "$HOME/.fluttervm/bin/flutter" ]; then
+    rm "$HOME/.fluttervm/bin/flutter"
+  fi
+
+  if [ -L "$HOME/.fluttervm/bin/dart" ]; then
+    rm "$HOME/.fluttervm/bin/dart"
+  fi
+}
+
+# Function to create new links
+create_new_links() {
+  if [ -d "$version_folder" ]; then
+    ln -s "$version_folder/bin/flutter" "$HOME/.fluttervm/bin/flutter"
+    ln -s "$version_folder/bin/dart" "$HOME/.fluttervm/bin/dart"
+  else
+    echo "Error: Version folder not found: $version_folder"
+    exit 1
+  fi
+}
+
+# Remove existing links if they exist
+remove_existing_links
+
+# Create new links
+create_new_links
