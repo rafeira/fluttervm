@@ -1,0 +1,5 @@
+versions/*
+!versions/.keep
+
+bin/*
+!bin/.keep
