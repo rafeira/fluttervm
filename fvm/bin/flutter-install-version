@@ -1,0 +1,43 @@
+# Function to display usage message
+usage() {
+  echo "Usage: $0 flutter_version"
+}
+
+# Check if Flutter version is provided as an argument
+if [ $# -eq 0 ]; then
+  usage
+  exit 1
+fi
+
+# Extract Flutter version from the argument
+flutter_version="$1"
+flutter_version_underscored=$(echo "$flutter_version" | tr '.' '_')
+flutter_archive="flutter_linux_${flutter_version}-stable.tar.xz"
+url="https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/${flutter_archive}"
+installation_folder="$HOME/.fluttervm/versions/$flutter_version_underscored"
+
+# Check the validity of the link
+response=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+
+if [ "$response" -eq 200 ]; then
+  echo "The link is valid. Downloading and extracting..."
+
+  # Create the installation folder if it doesn't exist
+  mkdir -p "$installation_folder"
+
+  # Download and extract the archive directly into the installation folder
+  curl -L "$url" | tar xJf - -C "$installation_folder" --strip-components=1
+
+  # Check if the download and extraction were successful
+  if [ $? -eq 0 ]; then
+    echo "Download and extraction completed successfully in the folder: $installation_folder."
+
+
+  else
+    echo "Failed to download or extract the archive."
+    exit 1
+  fi
+else
+  echo "The link is invalid. Aborting the script."
+  exit 1
+fi
